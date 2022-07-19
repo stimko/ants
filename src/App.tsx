@@ -1,24 +1,87 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from "react";
+import "./App.css";
+import { AppBar, Box, Button, Toolbar } from "@mui/material";
+import { Ant, Status } from "./components/AntStatus";
+import generateAntWinLikelihoodCalculator from "./utils/generateAntWinLikelihoodCalculator";
+import getAnts from "./services/getAnts";
+import Ants from "./components/Ants";
 
 function App() {
+  const [ants, setAnts] = useState<Ant[]>([]);
+
+  const [raceStatus, setRaceStatus] = useState(Status["not yet run"]);
+  const [antStatus, setAntStatus] = useState<Record<string, Status>>({});
+  const [antProbability, setAntProbability] = useState<Record<string, number>>(
+    {}
+  );
+
+  const handleCalculationComplete = (
+    likelihoodOfAntWinning: number,
+    name: string
+  ) => {
+    setAntProbability((prevState) => ({
+      ...prevState,
+      [name]: likelihoodOfAntWinning,
+    }));
+    setAntStatus((prevState) => {
+      const updatedStatus = { ...prevState, [name]: Status.completed };
+      if (ants.every((ant) => updatedStatus[ant.name] === Status.completed)) {
+        setRaceStatus(Status.completed);
+      }
+      return updatedStatus;
+    });
+  };
+
+  const calculateWinStats = () => {
+    ants?.forEach((ant) => {
+      setAntStatus({ ...antStatus, [ant.name]: Status["in progress"] });
+      generateAntWinLikelihoodCalculator()((prob: number) => {
+        handleCalculationComplete(prob, ant.name);
+      });
+    });
+  };
+
+  const loadAnts = () => {
+    setAnts([]);
+    setAntProbability({});
+    setAntStatus({});
+    getAnts((ants) => setAnts(ants));
+  };
+
+  const startRace = () => {
+    setRaceStatus(Status["in progress"]);
+    calculateWinStats();
+  };
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Box>
+        <AppBar>
+          <Toolbar>
+            <Button variant="contained" onClick={loadAnts}>
+              {"Load Ants"}
+            </Button>
+            <Button variant="contained" onClick={startRace} sx={{ ml: 3 }}>
+              {"Start Race"}
+            </Button>
+          </Toolbar>
+        </AppBar>
+      </Box>
+      <Box component="main">
+        <Toolbar />
+        <div>Race Status: {Status[raceStatus]}</div>
+
+        <Ants
+          ants={ants.sort((a, b) => {
+            const probA: number = antProbability[a.name] || 0;
+            const probB: number = antProbability[b.name] || 0;
+
+            return probB - probA;
+          })}
+          antProbability={antProbability}
+          antStatus={antStatus}
+        />
+      </Box>
     </div>
   );
 }
