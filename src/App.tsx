@@ -33,7 +33,7 @@ function App() {
   };
 
   const calculateWinStats = () => {
-    ants?.forEach((ant) => {
+    ants.forEach((ant) => {
       setAntStatus({ ...antStatus, [ant.name]: Status["in progress"] });
       generateAntWinLikelihoodCalculator()((prob: number) => {
         handleCalculationComplete(prob, ant.name);
@@ -58,10 +58,15 @@ function App() {
       <Box>
         <AppBar>
           <Toolbar>
-            <Button variant="contained" onClick={loadAnts}>
+            <Button variant="contained" className="loadAnts" onClick={loadAnts}>
               {"Load Ants"}
             </Button>
-            <Button variant="contained" onClick={startRace} sx={{ ml: 3 }}>
+            <Button
+              variant="contained"
+              className="startRace"
+              onClick={startRace}
+              sx={{ ml: 3 }}
+            >
               {"Start Race"}
             </Button>
           </Toolbar>
