@@ -34,7 +34,9 @@ function App() {
 
   const calculateWinStats = () => {
     ants.forEach((ant) => {
-      setAntStatus({ ...antStatus, [ant.name]: Status["in progress"] });
+      setAntStatus((prevState) => {
+        return { ...prevState, [ant.name]: Status["in progress"] };
+      });
       generateAntWinLikelihoodCalculator()((prob: number) => {
         handleCalculationComplete(prob, ant.name);
       });
@@ -74,7 +76,9 @@ function App() {
       </Box>
       <Box component="main">
         <Toolbar />
-        <div>Race Status: {Status[raceStatus]}</div>
+        <div>
+          Race Status: <div>{Status[raceStatus]}</div>
+        </div>
 
         <Ants
           ants={ants.sort((a, b) => {

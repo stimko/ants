@@ -27,7 +27,7 @@ function AntStatus({ ant, status, winProbability }: AntProps) {
       className="Ant"
     >
       <div>{ant.name}</div>
-      <div>{Status[status]}</div>
+      <div className="antStatus">{Status[status]}</div>
       <div>{winProbability}</div>
     </Card>
   );

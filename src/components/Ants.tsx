@@ -15,7 +15,7 @@ function Ants({ ants, antProbability, antStatus }: AntsProps) {
             <AntStatus
               key={ant.name}
               ant={ant}
-              status={antStatus[ant.name] || Status["not yet run"]}
+              status={antStatus[ant.name] ?? Status["not yet run"]}
               winProbability={antProbability[ant.name]}
             ></AntStatus>
           );
